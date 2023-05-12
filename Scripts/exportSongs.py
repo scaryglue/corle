@@ -5,6 +5,9 @@ from requests import get
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+import pytube
+from pytube import YouTube
+from pytube import Playlist
 
 # example code from https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
 
@@ -77,4 +80,8 @@ def downloadSong(title):
     first_thirty_seconds.export(filename, format="mp3")
     print(filename)
 
-downloadSong('Homesick by Dayseeker')
+p = Playlist('https://www.youtube.com/playlist?list=PLIzfUwhkXefcHBekIVgx-2WD_j1r5bIT0')
+
+for video in p.videos:
+    stream = video.streams.get_by_itag(251)
+    stream.download()

@@ -80,8 +80,15 @@ def downloadSong(title):
     first_thirty_seconds.export(filename, format="mp3")
     print(filename)
 
-p = Playlist('https://www.youtube.com/playlist?list=PLIzfUwhkXefcHBekIVgx-2WD_j1r5bIT0')
+def downloadPlaylist(link):
+   p = Playlist(link)
+   for video in p.videos:
+        stream = video.streams.get_by_itag(251)
+        stream.download()
 
-for video in p.videos:
-    stream = video.streams.get_by_itag(251)
-    stream.download()
+def getTitles(link):
+    p = Playlist(link)
+    for video in p.videos:
+        print(video.title +' by ' +video.author)
+
+getTitles('https://youtube.com/playlist?list=PLIzfUwhkXefcHBekIVgx-2WD_j1r5bIT0')

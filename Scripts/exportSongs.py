@@ -27,6 +27,16 @@ def my_hook(d):
         print('Done downloading, now converting ...')
 
 def search(arg):
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '128',
+        }],
+        'logger': MyLogger(),
+        'progress_hooks': [my_hook],
+    }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         try:
             get(arg) 
@@ -66,3 +76,5 @@ def downloadSong(title):
     
     first_thirty_seconds.export(filename, format="mp3")
     print(filename)
+
+downloadSong('Homesick by Dayseeker')

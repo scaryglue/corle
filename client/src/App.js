@@ -69,25 +69,25 @@ const filterSongs = (inputValue, recommendedSongs) => {
 function App() {
   return (
     <div>
+      <div class="py-4 flex justify-center">
+          <button>
+            <svg class="w-5 h-5 fill-current block" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <polygon id="Rectangle-161" points="4 4 16 10 4 16"></polygon>
+            </svg>
+          </button>
+      </div>
       <div className="w-full max-w-xl flex mx-auto">
-        <AsyncSelect className="w-full placeholder-gray-400 text-gray-900 p-4"
+        <AsyncSelect className="w-full placeholder-gray-400 text-gray-900"
           loadOptions={loadOptions}
           placeholder="Type in the song!"
         />
       </div>
-      <div class="gap-x-8 w-full max-w-xl flex mx-auto justify-center items-stretch">
+      <div class="py-4 gap-x-8 w-full max-w-xl flex mx-auto justify-between items-stretch">
         <div>
           <button
             type="button"
             class="self-center inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]">
             GUESS
-          </button>
-        </div>
-        <div class="self-center">
-          <button>
-            <svg class="w-5 h-5 fill-current block" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <polygon id="Rectangle-161" points="4 4 16 10 4 16"></polygon>
-            </svg>
           </button>
         </div>
         <div>

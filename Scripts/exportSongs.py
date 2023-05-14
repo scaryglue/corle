@@ -5,15 +5,21 @@ from requests import get
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
-import pytube
+from firebase_admin import storage
 from pytube import YouTube
 from pytube import Playlist
+import os
 
 # example code from https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
 
-cred = credentials.Certificate("/Users/hamzaahmad/Documents/corle-75b82-firebase-adminsdk-iryqs-de1a259342.json")
-firebase_admin.initialize_app(cred)
+cred = credentials.Certificate("/home/hamz/Projekte/corle-75b82-firebase-adminsdk-iryqs-de1a259342.json")
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'corle-75b82.appspot.com',
+    'databaseURL': 'https://corle-75b82-default-rtdb.europe-west1.firebasedatabase.app/'
+})
 
+bucket = storage.bucket()
+ref = db.reference('songs')
 
 class MyLogger(object):
     def debug(self, msg):
@@ -80,15 +86,34 @@ def downloadSong(title):
     first_thirty_seconds.export(filename, format="mp3")
     print(filename)
 
-def downloadPlaylist(link):
+def exportPlaylist(link, bucket):
    p = Playlist(link)
    for video in p.videos:
-        stream = video.streams.get_by_itag(251)
-        stream.download()
+        if not os.path.isfile(video.title +' by ' +video.author +'.webm'):
+            stream = video.streams.get_by_itag(251)
+            stream.download()
+            os.rename(video.title +'.webm', video.title +' by ' +video.author +'.webm')
+            song = AudioSegment.from_file(video.title +' by ' +video.author +'.webm')
+            thirty_seconds = 30 * 1000
+            first_30_seconds = song[:thirty_seconds]
+            first_30_seconds.export(video.title +' by ' +video.author +'.webm')
+            #song is exported with 30 second cut
+            #upload to firebase storage:
+            blob = bucket.blob('songs/' +video.title +' by ' +video.author +'.webm')
+            blob.upload_from_filename(video.title +' by ' +video.author +'.webm')
+            blob.make_public()
+
+        #set database entry for search
+        ref.update({
+            video.title +' by ' +video.author: {
+                'path': 'songs/' +video.title +' by ' +video.author +'.webm'
+            }
+        })
 
 def getTitles(link):
     p = Playlist(link)
     for video in p.videos:
         print(video.title +' by ' +video.author)
 
-getTitles('https://youtube.com/playlist?list=PLIzfUwhkXefcHBekIVgx-2WD_j1r5bIT0')
+#getTitles('https://youtube.com/playlist?list=PLIzfUwhkXefcHBekIVgx-2WD_j1r5bIT0')
+exportPlaylist("https://youtube.com/playlist?list=PLIzfUwhkXefcHBekIVgx-2WD_j1r5bIT0", bucket)

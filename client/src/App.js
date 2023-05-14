@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { set, ref, getDatabase } from "firebase/database";
+import { get, child, set, ref, getDatabase } from "firebase/database";
 import { getStorage, ref as sref, getDownloadURL } from "firebase/storage";
 import { Howl } from "howler";
+import AsyncSelect from 'react-select/async';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -18,7 +19,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const database = getDatabase(app, process.env.REACT_APP_DATABASE);
+const database = ref(getDatabase(app, process.env.REACT_APP_DATABASE));
 const storage = getStorage();
 
 const downloadAudio = async (path) => {
@@ -34,15 +35,47 @@ const downloadAudio = async (path) => {
   sound.stop();
 };
 
+const loadOptions = async (inputValue) => {
+    return new Promise((resolve => {
+            get(child(database, 'songs'))
+                .then((snapshot) => {
+                    const recommendedSongs = []
+                    if (snapshot.exists()) {
+                      snapshot.forEach(function (snapshot) {
+                        const newVal = {
+                          label: snapshot.key, value: snapshot.key
+                        }
+                        recommendedSongs.push(newVal)
+                      })
+                    }
+                    else {
+                      console.log('found no data')
+                    }
+                    return resolve(filterSongs(inputValue, recommendedSongs))
+                }).catch((error) => {
+                  console.error(error)
+                })
+              
+        })
+    )
+}
+
+const filterSongs = (inputValue, recommendedSongs) => {
+  return recommendedSongs.filter((song) => 
+  song.label.toLowerCase().includes(inputValue.toLowerCase()))
+}
+
+
 function App() {
   return (
     <div>
-      <button onClick={() => downloadAudio("songs/file_example_MP3_700KB.mp3")}>
-        moin
-      </button>
+      <AsyncSelect
+            loadOptions={loadOptions}
+      />
     </div>
   );
 }
+
 
 function timeout(delay) {
   return new Promise((res) => setTimeout(res, delay));

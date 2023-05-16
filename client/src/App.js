@@ -22,18 +22,6 @@ const analytics = getAnalytics(app);
 const database = ref(getDatabase(app, process.env.REACT_APP_DATABASE));
 const storage = getStorage();
 
-const downloadAudio = async (path) => {
-  const uri = await getDownloadURL(sref(storage, path));
-
-  const sound = new Howl({
-    src: [uri],
-    html5: true,
-  });
-  sound.load();
-  sound.play();
-  await timeout(5000);
-  sound.stop();
-};
 
 const loadOptions = async (inputValue) => {
   return new Promise((resolve => {
@@ -55,7 +43,6 @@ const loadOptions = async (inputValue) => {
       }).catch((error) => {
         console.error(error)
       })
-
   })
   )
 }
@@ -67,14 +54,54 @@ const filterSongs = (inputValue, recommendedSongs) => {
 
 
 function App() {
+
+  const [progress, setProgress] = useState(0)
+  const [sound, setSound] = useState(null)
+  const soundPath = "songs/DYWTYLM by Sleep Token.webm"
+
+
+  useEffect(() => {
+    getDownloadURL(sref(storage, soundPath)).then(url => {
+      setSound(new Howl({
+        src: [url],
+        html5: true
+      }))
+    })
+  }, [])
+
+  const playAudio = async () => {
+    sound.load();
+    sound.play();
+    requestAnimationFrame(handleProgress)
+    await timeout(5000);
+    sound.stop();
+  };
+
+  function handlePause() {
+    sound.pause();
+    cancelAnimationFrame(handleProgress, sound);
+  }
+
+  function handleProgress() {
+    setProgress(sound.seek() / sound.duration());
+    requestAnimationFrame(handleProgress);
+  }
+
+
   return (
     <div>
-      <div class="py-4 flex justify-center">
-          <button>
-            <svg class="w-5 h-5 fill-current block" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <polygon id="Rectangle-161" points="4 4 16 10 4 16"></polygon>
-            </svg>
-          </button>
+      <div className="py-4 flex justify-center">
+        <div className="mb-6 h-5 bg-neutral-200 dark:bg-neutral-600">
+          <progress className="h-5 bg-primary" value={progress}></progress>
+        </div>
+      </div>
+      <div className="py-4 flex justify-center">
+        <button onClick={() => playAudio('songs/DYWTYLM by Sleep Token.webm')}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5V18M15 7.5V18M3 16.811V8.69c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 010 1.954l-7.108 4.061A1.125 1.125 0 013 16.811z" />
+          </svg>
+
+        </button>
       </div>
       <div className="w-full max-w-xl flex mx-auto">
         <AsyncSelect className="w-full placeholder-gray-400 text-gray-900"
@@ -82,18 +109,18 @@ function App() {
           placeholder="Type in the song!"
         />
       </div>
-      <div class="py-4 gap-x-8 w-full max-w-xl flex mx-auto justify-between items-stretch">
+      <div className="py-4 gap-x-8 w-full max-w-xl flex mx-auto justify-between items-stretch">
         <div>
           <button
             type="button"
-            class="self-center inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]">
+            className="self-center inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]">
             GUESS
           </button>
         </div>
         <div>
           <button
             type="button"
-            class="self-center inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]">
+            className="self-center inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]">
             SKIP (+5S)
           </button>
         </div>

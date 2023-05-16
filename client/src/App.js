@@ -91,8 +91,8 @@ function App() {
   return (
     <div>
       <div className="py-4 flex justify-center">
-        <div className="mb-6 h-5 bg-neutral-200 dark:bg-neutral-600">
-          <progress className="h-5 bg-primary" value={progress}></progress>
+        <div className="mb-6 h-5 bg-gray-200 rounded-full dark:bg-neutral-600 overflow-hidden">
+          <progress className="h-full bg-blue-500" value={progress}></progress>
         </div>
       </div>
       <div className="py-4 flex justify-center">

@@ -57,8 +57,10 @@ function App() {
   const [progress, setProgress] = useState(0)
   const [sound, setSound] = useState(null)
   const [won, setWon] = useState(false)
+  const [tries, setTries] = useState(0)
   const soundPath = "songs/Burial Plot by Dayseeker.webm"
   const title = "Burial Plot by Dayseeker"
+
 
   useEffect(() => {
     getDownloadURL(sref(storage, soundPath)).then((url) => {
@@ -75,7 +77,7 @@ function App() {
     sound.load();
     sound.play();
     requestAnimationFrame(handleProgress);
-    await timeout(5000);
+    await timeout(5000 * (tries + 1));
     sound.stop();
   };
 
@@ -93,15 +95,18 @@ function App() {
     if (input.label === title) {
       setWon(true)
     }
+    else {
+      setTries(tries + 1)
+    }
   }
 
 
   return (
-    <div>
+    <div className="bg-dark text-white">
       <div className="py-4 flex justify-center">
-        <div className="w-1/4 h-6 bg-gray-200 rounded-full dark:bg-gray-700">
+        <div className="w-1/4 h-6 bg-white rounded-full">
           <div
-            className="h-6 bg-blue-600 rounded-full dark:bg-blue-500"
+            className="h-6 bg-green rounded-full dark:bg-blue-500"
             style={{ width: progress * 100 + "%" }}
           ></div>
         </div>
@@ -138,9 +143,9 @@ function App() {
           </button>
         </div>
       </div>
-      {won ? <div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold">
-        You won
-      </div> : <div></div>}
+      {won ? <div><div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold">
+        You won </div>
+        <div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold"> The song was: {title}</div> </div> : <div></div>}
     </div>
   );
 }

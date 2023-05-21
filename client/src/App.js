@@ -53,12 +53,14 @@ const filterSongs = (inputValue, recommendedSongs) => {
 }
 
 
-function App() {
 
+function App() {
+  const [input, setInput] = useState("")
   const [progress, setProgress] = useState(0)
   const [sound, setSound] = useState(null)
-  const soundPath = "songs/DYWTYLM by Sleep Token.webm"
-
+  const [won, setWon] = useState(false)
+  const soundPath = "songs/Burial Plot by Dayseeker.webm"
+  const title = "Burial Plot by Dayseeker"
 
   useEffect(() => {
     getDownloadURL(sref(storage, soundPath)).then(url => {
@@ -87,6 +89,12 @@ function App() {
     requestAnimationFrame(handleProgress);
   }
 
+  const makeGuess = () => {
+    if (input.label === title) {
+      setWon(true)
+    }
+  }
+
 
   return (
     <div>
@@ -96,7 +104,7 @@ function App() {
         </div>
       </div>
       <div className="py-4 flex justify-center">
-        <button onClick={() => playAudio('songs/DYWTYLM by Sleep Token.webm')}>
+        <button onClick={() => playAudio()}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5V18M15 7.5V18M3 16.811V8.69c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 010 1.954l-7.108 4.061A1.125 1.125 0 013 16.811z" />
           </svg>
@@ -107,13 +115,14 @@ function App() {
         <AsyncSelect className="w-full placeholder-gray-400 text-gray-900"
           loadOptions={loadOptions}
           placeholder="Type in the song!"
+          onChange={(inputValue) => setInput(inputValue)}
         />
       </div>
       <div className="py-4 gap-x-8 w-full max-w-xl flex mx-auto justify-between items-stretch">
         <div>
           <button
             type="button"
-            className="self-center inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]">
+            className="self-center inline-block rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#cbcbcb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(203,203,203,0.3),0_4px_18px_0_rgba(203,203,203,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(251,251,251,0.3)] dark:hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)] dark:active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.1),0_4px_18px_0_rgba(251,251,251,0.05)]" onClick={() => makeGuess()}>
             GUESS
           </button>
         </div>
@@ -125,6 +134,9 @@ function App() {
           </button>
         </div>
       </div>
+      {won ? <div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold">
+        You won
+      </div> : <div></div>}
     </div>
   );
 }

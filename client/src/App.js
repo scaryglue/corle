@@ -107,6 +107,9 @@ function App() {
   }
 
   const makeGuess = () => {
+    if(won) {
+      return;
+    }
     if (input.label === title) {
       setWon(true)
     }
@@ -114,11 +117,16 @@ function App() {
       if (tries === 6) {
         setLost(true)
       }
-      setTries(tries + 1)
+      else {
+        setTries(tries + 1)
+      }
     }
   }
 
   const skipTime = () => {
+    if(won) {
+      return;
+    }
     if (tries === 6) {
       //tell the user that he/she has to guess
       setNoTries(true)
@@ -176,10 +184,10 @@ function App() {
       {skipped ? <div className="py-4 text-xl flex w-full max-w-xl flex mx-auto justify-center font-bold">
         Added {tries * 5}s </div> : null}
       {won ? <div><div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold">
-        You won </div>
+        <span role="img" aria-label="checkmark">✅</span>You won in: {tries === 0 ? <text>1 try!</text> : <text>{tries + 1} tries!</text>}<span role="img" aria-label="checkmark">✅</span></div>
         <div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold"> The song was: {title}</div> </div> : null}
       {lost ? <div><div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold">
-        You lost :( </div>
+        <span role="img" aria-label="cross">❌</span>You lost :(<span role="img" aria-label="cross">❌</span></div>
         <div className="py-4 text-2xl flex w-full max-w-xl flex mx-auto justify-center font-bold"> The song was: {title}</div> </div> : null}
     </div>
   );

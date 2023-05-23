@@ -30,4 +30,4 @@
 /client/yarn-debug.log*
 /client/yarn-error.log*
 #downloaded Songs
-/Scripts/*.webm
+/scripts/*.webm

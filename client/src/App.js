@@ -107,7 +107,7 @@ function App() {
   }
 
   const makeGuess = () => {
-    if(won) {
+    if (won) {
       return;
     }
     if (input.label === title) {
@@ -124,7 +124,7 @@ function App() {
   }
 
   const skipTime = () => {
-    if(won) {
+    if (won) {
       return;
     }
     if (tries === 6) {

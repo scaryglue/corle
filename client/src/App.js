@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { initializeApp } from "firebase/app";
 import { get, child, ref, getDatabase } from "firebase/database";
 import { getStorage, ref as sref, getDownloadURL } from "firebase/storage";
-import { Howl } from "howler";
 import AsyncSelect from "react-select/async";
 
 const firebaseConfig = {
@@ -53,7 +52,6 @@ const filterSongs = (inputValue, recommendedSongs) => {
 function App() {
   const [input, setInput] = useState("")
   const [progress, setProgress] = useState(0)
-  const [sound, setSound] = useState(null)
   const [won, setWon] = useState(false)
   const [tries, setTries] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -61,6 +59,9 @@ function App() {
   const [lost, setLost] = useState(false)
   const [skipped, setSkipped] = useState(false)
   const [title, setTitle] = useState(null)
+
+  const audioRef = useRef()
+  const [songUrl, setUrl] = useState(null)
 
 
   useEffect(() => {
@@ -70,14 +71,9 @@ function App() {
       await get(child(database, 'currentSong/title')).then((snapshot) => {
         if (snapshot.exists()) {
           setTitle(snapshot.val());
-          const soundPath = '/songs/' + snapshot.val() + '.webm'
+          const soundPath = '/songs/' + snapshot.val() + '.mp3'
           getDownloadURL(sref(storage, soundPath)).then((url) => {
-            setSound(
-              new Howl({
-                src: [url],
-                html5: true,
-              })
-            );
+            setUrl(url)
           });
         } else {
           console.log("No data available");
@@ -90,19 +86,25 @@ function App() {
     getSong()
   }, []);
 
-  const playAudio = async () => {
+  
+  const play = async () => {
     setLoading(true)
-    await sound.load();
+    await audioRef.current.load()
     setLoading(false)
-    sound.play();
-    requestAnimationFrame(handleProgress);
-    await timeout(5000 * (tries + 1));
-    sound.stop();
-  };
+    audioRef.current.play()
+    requestAnimationFrame(handleProgress)
+    await timeout(5000 * (tries + 1))
+    stop()
+  }
+
+  const stop = () => {
+    audioRef.current.pause()
+    audioRef.current.currentTime = 0;
+  }
 
 
   function handleProgress() {
-    setProgress(sound.seek() / sound.duration());
+    setProgress(audioRef.current.currentTime / audioRef.current.duration);
     requestAnimationFrame(handleProgress);
   }
 
@@ -148,7 +150,8 @@ function App() {
         </div>
       </div>
       <div className="py-4 flex justify-center">
-        <button onClick={() => playAudio()}>
+        <audio preload="true" ref={audioRef} src={songUrl}></audio>
+        <button onClick={() => play()}>
           {loading ? <svg className="animate-spin h-5 w-5 mr-3 ..." viewBox="0 0 24 24">
           </svg> : <div>▶</div>}
         </button>

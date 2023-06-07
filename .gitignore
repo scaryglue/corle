@@ -31,3 +31,4 @@
 /client/yarn-error.log*
 #downloaded Songs
 /scripts/*.webm
+/scripts/*.mp3

@@ -12,7 +12,7 @@ import os
 
 # example code from https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
 
-cred = credentials.Certificate("/home/hamz/Projekte/corle-75b82-firebase-adminsdk-iryqs-de1a259342.json")
+cred = credentials.Certificate("/Users/hamzaahmad/Documents/corle-75b82-firebase-adminsdk-iryqs-de1a259342.json")
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'corle-75b82.appspot.com',
     'databaseURL': 'https://corle-75b82-default-rtdb.europe-west1.firebasedatabase.app/'
@@ -92,18 +92,20 @@ def exportPlaylist(link, bucket):
    i = 0
    currentMaxSong = 0
    for video in p.videos:
-        if not os.path.isfile(video.title +' by ' +video.author +'.webm'):
-            stream = video.streams.get_by_itag(251)
-            stream.download()
-            os.rename(video.title +'.webm', video.title +' by ' +video.author +'.webm')
-            song = AudioSegment.from_file(video.title +' by ' +video.author +'.webm')
+        if not os.path.isfile(video.title +' by ' +video.author +'.mp3'):
+            stream = video.streams.filter(only_audio=True).first()
+            out_file = stream.download()
+            new_file = video.title +' by ' +video.author + '.mp3'
+            os.rename(out_file, new_file)
+            song = AudioSegment.from_file(video.title +' by ' +video.author +'.mp3')
             thirty_seconds = 30 * 1000
             first_30_seconds = song[:thirty_seconds]
-            first_30_seconds.export(video.title +' by ' +video.author +'.webm')
+            first_30_seconds.export(video.title +' by ' +video.author +'.mp3')
             #song is exported with 30 second cut
             #upload to firebase storage:
-            blob = bucket.blob('songs/' +video.title +' by ' +video.author +'.webm')
-            blob.upload_from_filename(video.title +' by ' +video.author +'.webm')
+            
+            blob = bucket.blob('songs/' +video.title +' by ' +video.author +'.mp3')
+            blob.upload_from_filename(video.title +' by ' +video.author +'.mp3')
             blob.make_public()
 
         #set database entry for search
@@ -111,7 +113,7 @@ def exportPlaylist(link, bucket):
         ref.update({
             i: {
                 'title': video.title +' by ' +video.author,
-                'path': 'songs/' +video.title +' by ' +video.author +'.webm',
+                'path': 'songs/' +video.title +' by ' +video.author +'.mp3',
                 'done': False
             }
         })
